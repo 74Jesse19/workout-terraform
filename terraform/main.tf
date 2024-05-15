@@ -72,8 +72,9 @@ resource "aws_security_group" "ssh" {
 # Launch 2 EC2 Instances
 resource "aws_instance" "webserver" {
   count         = 2
-  ami           = "ami-0bb84b8ffd87024d8" # Update with your desired AMI
+  ami           = "ami-0bb84b8ffd87024d8" 
   instance_type = "t2.micro"
+  associate_public_ip_address = true
 
   subnet_id = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.ssh.id]
