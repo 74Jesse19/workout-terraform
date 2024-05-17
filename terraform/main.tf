@@ -112,6 +112,11 @@ resource "aws_iam_role_policy_attachment" "backend_dynamodb_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
+resource "aws_iam_instance_profile" "backend_profile" {
+  name = "backend-dynamodb-access-profile"
+  role  = aws_iam_role.backend_dynamodb_access.name
+}
+
 resource "aws_instance" "artifactory" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
@@ -126,25 +131,25 @@ resource "aws_instance" "artifactory" {
 }
 
 resource "aws_instance" "backend" {
-  ami           = "ami-0bb84b8ffd87024d8"
+  ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
-  key_name = "JW-SSH-KEY"
+  key_name = "Backend-key"
   associate_public_ip_address = true
   subnet_id                    = aws_subnet.public.id
-  vpc_security_group_ids       = [aws_security_group.ssh.id, aws_security_group.http.id]
-
+  vpc_security_group_ids       = [aws_security_group.ssh.id,aws_security_group.http.id]
+  iam_instance_profile = aws_iam_instance_profile.backend_profile.name
   tags = {
     Name = "Backend Server"
   }
 }
 
 resource "aws_instance" "frontend" {
-  ami           = "ami-0bb84b8ffd87024d8"
+  ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
-  key_name = "JW-SSH-KEY"
+  key_name = "Frontend-key"
   associate_public_ip_address = true
   subnet_id                    = aws_subnet.public.id
-  vpc_security_group_ids       = [aws_security_group.ssh.id]
+  vpc_security_group_ids       = [aws_security_group.ssh.id,aws_security_group.http.id]
 
   tags = {
     Name = "Frontend Server"
