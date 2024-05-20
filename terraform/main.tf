@@ -69,7 +69,7 @@ resource "aws_security_group" "http" {
   }
 }
 
-
+# Create security group to allow SSH access
 resource "aws_security_group" "ssh" {
   name = "SSH Access"
   vpc_id = aws_vpc.main.id
@@ -88,6 +88,8 @@ resource "aws_security_group" "ssh" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+#IAM role for the backend server to talk to DynamoDb
 resource "aws_iam_role" "backend_dynamodb_access" {
   name = "backend-dynamodb-access"
 
@@ -107,16 +109,19 @@ resource "aws_iam_role" "backend_dynamodb_access" {
 EOF
 }
 
+#Attaches IAM policy to role for Backend access to DynamoDb
 resource "aws_iam_role_policy_attachment" "backend_dynamodb_policy" {
   role       = aws_iam_role.backend_dynamodb_access.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
+#Creates an instance profile that references the role above
 resource "aws_iam_instance_profile" "backend_profile" {
   name = "backend-dynamodb-access-profile"
   role  = aws_iam_role.backend_dynamodb_access.name
 }
 
+# Create EC2 instance for artifactory server
 resource "aws_instance" "artifactory" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
@@ -129,6 +134,7 @@ resource "aws_instance" "artifactory" {
   }
 }
 
+# Create Elastic IP for artifactory so it will keep the same public IP after server stop/restarts
 resource "aws_eip" "artifactory_eip" {
   instance = aws_instance.artifactory.id
   tags = {
@@ -136,6 +142,7 @@ resource "aws_eip" "artifactory_eip" {
   }
 }
 
+#Create ec2 instance for backend 
 resource "aws_instance" "backend" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
@@ -149,6 +156,7 @@ resource "aws_instance" "backend" {
   }
 }
 
+#Elastic ip for backend
 resource "aws_eip" "backend_eip" {
   instance = aws_instance.backend.id
   tags = {
@@ -156,6 +164,7 @@ resource "aws_eip" "backend_eip" {
   }
 }
 
+#Create ec2 instance for frontend server
 resource "aws_instance" "frontend" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
@@ -169,6 +178,7 @@ resource "aws_instance" "frontend" {
   }
 }
 
+#Elastic ip for frontend
 resource "aws_eip" "frontend_eip" {
   instance = aws_instance.frontend.id
   tags = {
@@ -178,7 +188,7 @@ resource "aws_eip" "frontend_eip" {
 
 
 
-# Create DynamoDB table named workouts and add
+# Create DynamoDB table named workouts and add Id attribute
 resource "aws_dynamodb_table" "workouts" {
   name = "workouts"
   hash_key = "id"
