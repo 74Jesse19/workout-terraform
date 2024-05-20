@@ -148,13 +148,13 @@ This document guides you through setting up a lab infrastructure for a workout a
 
 7. **Transfer and Deploy Frontend Build:**
    - transfer build folder that is created when you run npm run build to the /var/www/html folder
-   - gave ownership of the directly like i did on artifactory.
+   - give ownership of the directly like we did on artifactory.
 		- also gave access to these files
       - sudo chown -R www-data:www-data /var/www/html/Build
       - sudo chmod -R 755 /var/www/html/Build
 	  - Create a virtual host configuration file (e.g., 000-default.conf) using nano or vim to tell Apache2 where to find your React app's files:
-     - <VirtualHost *:80> ServerAdmin your_email@example.com DocumentRoot /var/www/html/your_app_name (or /var/www/myapp) <Directory /var/www/html/your_app_name (or /var/www/myapp)> Options Indexes FollowSymLinks AllowOverride All Require all granted </Directory> ErrorLog ${APACHE_LOG_DIR}/error.log CustomLog ${APACHE_LOG_DIR}/custom.log combined </VirtualHost>
-		- Enable the Virtual Host Configuration:
+      ![alt text](image.png)
+    - Enable the Virtual Host Configuration:
 		- a.sudo a2ensite 000-default.conf
 			-  restart apache
 				- sudo systemctl restart apache2
