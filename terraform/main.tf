@@ -121,7 +121,6 @@ resource "aws_instance" "artifactory" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
   key_name = "JW-SSH-KEY"
-  associate_public_ip_address = true
   subnet_id                    = aws_subnet.public.id
   vpc_security_group_ids       = [aws_security_group.ssh.id,aws_security_group.http.id]
 
@@ -130,11 +129,18 @@ resource "aws_instance" "artifactory" {
   }
 }
 
+resource "aws_eip" "artifactory_eip" {
+  instance = aws_instance.artifactory.id
+  tags = {
+    Name = "EIP for Artifactory"
+  }
+}
+
 resource "aws_instance" "backend" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
   key_name = "Backend-key"
-  associate_public_ip_address = true
+  # public_ip = aws_eip.backend_eip.public_ip
   subnet_id                    = aws_subnet.public.id
   vpc_security_group_ids       = [aws_security_group.ssh.id,aws_security_group.http.id]
   iam_instance_profile = aws_iam_instance_profile.backend_profile.name
@@ -143,16 +149,30 @@ resource "aws_instance" "backend" {
   }
 }
 
+resource "aws_eip" "backend_eip" {
+  instance = aws_instance.backend.id
+  tags = {
+    Name = "EIP for Backend"
+  }
+}
+
 resource "aws_instance" "frontend" {
   ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
   key_name = "Frontend-key"
-  associate_public_ip_address = true
+  # public_ip = aws_eip.frontend_eip.public_ip
   subnet_id                    = aws_subnet.public.id
   vpc_security_group_ids       = [aws_security_group.ssh.id,aws_security_group.http.id]
 
   tags = {
     Name = "Frontend Server"
+  }
+}
+
+resource "aws_eip" "frontend_eip" {
+  instance = aws_instance.frontend.id
+  tags = {
+    Name = "EIP for Frontend"
   }
 }
 
@@ -175,13 +195,13 @@ resource "aws_dynamodb_table" "workouts" {
 
 # Output public IP addresses of the instances
 output "artifactory_public_ip" {
-  value = aws_instance.artifactory.public_ip
+  value = aws_eip.artifactory_eip.public_ip
 }
 
 output "backend_public_ip" {
-  value = aws_instance.backend.public_ip
+  value = aws_eip.backend_eip.public_ip
 }
 
 output "frontend_public_ip" {
-  value = aws_instance.frontend.public_ip
+  value = aws_eip.frontend_eip.public_ip
 }
