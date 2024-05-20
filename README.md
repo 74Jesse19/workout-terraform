@@ -4,10 +4,10 @@ This document guides you through setting up a lab infrastructure for a workout a
 
 ## Setting Up Infrastructure with Terraform
 
-1. **Create Terraform Configuration:**
+1. **Terraform Configuration:**
 
-   - This terrafrom configuration includes these resources:
-     - 3 Servers (Artifactory, Backend, Frontend)
+   - The file main.tf is a terraform configuration that includes these resources:
+     - 3 Servers (Artifactory, Backend, Frontend) with Elastic IP's for public access
      - DynamoDB
      - Internet Gateway
      - Public Subnet with a Route Table and route to Internet Gateway
@@ -22,8 +22,8 @@ This document guides you through setting up a lab infrastructure for a workout a
      terraform apply
      terraform destroy (for cleanup)
      ```
-
-2. **SSH into Artifactory and Install Apache2:**
+## Setting Up the artifactory server
+1. **SSH into Artifactory and Install Apache2:**
 
    - Connect to the Artifactory server using SSH (e.g., Putty).
    - Install Apache2 server:
@@ -61,7 +61,7 @@ This document guides you through setting up a lab infrastructure for a workout a
 
 ## Setting Up the Backend Server
 
-3. **Update and Install Docker:**
+1. **Update and Install Docker:**
 
    - Connect to the backend server using SSH.
    - Update the server's package list:
@@ -76,7 +76,7 @@ This document guides you through setting up a lab infrastructure for a workout a
      sudo apt-get install docker.io
      ```
 
-4. **Create a Dockerfile:**
+2. **Create a Dockerfile:**
 
    - Use `nano` to create a Dockerfile named `dockerfile` (or any name you prefer):
 
@@ -94,7 +94,7 @@ This document guides you through setting up a lab infrastructure for a workout a
 
    - Save the file (Ctrl+O) and exit Nano (Ctrl+X).
 
-5. **Build and Run the Docker Image:**
+3. **Build and Run the Docker Image:**
 
    - Build the Docker image from the Dockerfile:
 
@@ -132,7 +132,7 @@ This document guides you through setting up a lab infrastructure for a workout a
 
 ## Setting Up the Frontend Server
 
-6. **Install Apache and Node.js:**
+1. **Install Apache and Node.js:**
 
    - Update the package list:
 
@@ -146,7 +146,7 @@ This document guides you through setting up a lab infrastructure for a workout a
      sudo apt install apache2 nodejs npm
      ```
 
-7. **Transfer and Deploy Frontend Build:**
+2. **Transfer and Deploy Frontend Build:**
    - transfer build folder that is created when you run npm run build to the /var/www/html folder
    - give ownership of the directly like we did on artifactory.
 		- also gave access to these files
